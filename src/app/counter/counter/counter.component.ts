@@ -1,25 +1,33 @@
 import { Component } from '@angular/core';
-import { CounterButtonComponent } from '../counter-button/counter-button.component';
-import { CounterOutputComponent } from '../counter-output/counter-output.component';
+import { Observable } from 'rxjs';
+import { AppState } from '../state/counter.state';
+import { Store } from '@ngrx/store';
+import { selectCount } from '../state/counter.selector';
+import { AsyncPipe } from '@angular/common';
+import { decrement, increment, reset } from '../state/counter.action';
 
 @Component({
   selector: 'app-counter',
   standalone: true,
-  imports: [CounterButtonComponent, CounterOutputComponent],
+  imports: [AsyncPipe],
   templateUrl: './counter.component.html',
   styleUrl: './counter.component.css',
 })
 export class CounterComponent {
-  public counter: number = 0;
+  count$!: Observable<number>;
 
+  constructor(private store: Store<AppState>) {
+    this.count$ = this.store.select(selectCount);
+  }
   OnIncrement() {
-    this.counter++;
+    this.store.dispatch(increment());
   }
+
   OnDecrement() {
-    this.counter--;
+    this.store.dispatch(decrement());
   }
+
   OnReset() {
-    console.log("call")
-    this.counter=0;
+    this.store.dispatch(reset());
   }
 }
